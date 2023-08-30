@@ -52,7 +52,7 @@ function App() {
 
   const clickButton  = () => {
     if(socket.connected) {
-      socket.emit("button");
+      socket.emit("button", { ok:true});
     }
   };
 
@@ -71,7 +71,7 @@ function App() {
       //setPositions(posId);
     });
     socket.on('button-click', (data) => { 
-      console.log('figa');
+      console.log('data');
       showMessage();
     });
 
