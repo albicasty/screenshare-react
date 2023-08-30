@@ -36,4 +36,11 @@ export class GatewayService implements OnGatewayInit, OnGatewayConnection, OnGat
     //this.server.emit('cursor-update', this.cursorDataListener.filter(x => x.userId === payload.userId).slice(-1));
     client.broadcast.emit('draw-update', payload);
   }
+
+  @SubscribeMessage('button')
+  handleMessageButton(client: Socket, payload: any[]): void {
+    this.pointsData = this.pointsData.concat(payload);
+    //this.server.emit('cursor-update', this.cursorDataListener.filter(x => x.userId === payload.userId).slice(-1));
+    client.broadcast.emit('button-click', payload);
+  }
 }
