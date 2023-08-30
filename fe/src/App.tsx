@@ -72,10 +72,12 @@ function App() {
 
   });
 
+  const [newPos,setNewPos] = useState<IPos>();
 
   const cursorMove = (e:React.MouseEvent) => { 
 
     const pos : IPos ={ x:e.clientX,y:e.clientY};
+    setNewPos (pos);
 
     sendCursor({...pos, userId:id});
 
@@ -88,8 +90,9 @@ function App() {
     >
 <div>
       {Object.entries(cursors).map(([id, position]) => (
-        <CursorComponent key={id} x={(position as any).x} y={(position as any).y} id={''} />
+        <CursorComponent key={id} x={(position as any).x} y={(position as any).y} id={''} color="blue" />
       ))}
+      {newPos &&  <CursorComponent key={id} x={newPos.x} y={newPos.y} id={''} color="red"/> } 
     </div>
 
       <Stage
@@ -115,6 +118,7 @@ function App() {
           />
 
           {points &&
+
 
             <Line
               points={points}

@@ -7,8 +7,12 @@ const cursorStyle = {
   backgroundColor: 'blue',
 };
 
-function CursorComponent({ x, y, id }: { x: number, y: number, id: string }) {
-  return <div style={{ ...cursorStyle, position: 'absolute', left: x, top: y }} />;
+function CursorComponent({ x, y, id,color }: { x: number, y: number, id: string, color:string }) {
+  return <div style={{ ...cursorStyle,
+    backgroundColor:color,
+     position: 'absolute', 
+    left: x,
+   top: y }} />;
 }
 
 export default CursorComponent;
