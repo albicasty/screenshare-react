@@ -71,12 +71,13 @@ function App() {
       //setPositions(posId);
     });
     socket.on('button-click', (data) => { 
+      console.log('figa');
       showMessage();
     });
 
     return () => {
       socket.off('cursor-update');
-      socket.off('buttonClicked');
+      socket.off('button-click');
     }
 
   });
