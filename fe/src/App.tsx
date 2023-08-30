@@ -31,7 +31,6 @@ function App() {
       const pointer = stageRef.current.getPointerPosition();
       const newPoints = points ? [...points, pointer.x, pointer.y] : [pointer.x, pointer.y];
       setPoints(newPoints);
-      sendCursor(pointer);
     }
   };
 
@@ -40,6 +39,7 @@ function App() {
 
   const [positions, setPositions] = useState<IPosID[]>([]);
 
+
   const sendCursor = (pos: IPosID) => {
     if (socket.connected) {
       socket.emit("cursor", { pos: pos, id: id });
@@ -47,7 +47,6 @@ function App() {
   }
 
   useEffect(() => {
-    fetch(`${address}:${port}`).then(rx => console.log(rx));
 
     socket.on('cursor-update', (data: IPosID[]) => {
       if (cursors[data[0].userId]) {  // Verifica che il cursore con quell'ID esista
@@ -66,9 +65,21 @@ function App() {
   });
 
 
+  const cursorMove = (e:React.MouseEvent) => { 
+
+    const pos : IPos ={ x:e.clientX,y:e.clientY};
+
+    sendCursor({pos:pos,id:id});
+
+  };
 
   return (
-    <>
+    <div
+    onMouseMove={cursorMove}
+    className={"fullDiv"}
+    >
+
+
       <Stage
         ref={stageRef}
         width={1024} height={1024}
@@ -107,7 +118,7 @@ function App() {
         </Layer>
 
       </Stage>
-    </>
+    </div>
   )
 }
 

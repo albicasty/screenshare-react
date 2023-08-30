@@ -40,3 +40,15 @@
 .read-the-docs {
   color: #888;
 }
+
+
+.fullDiv { 
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw; /* 100% of viewport width */
+    height: 100vh; /* 100% of viewport height */
+    display:flex;
+    justify-content: center;
+    align-items: center;
+}
