@@ -2,7 +2,9 @@ import './App.css'
 import { Layer, Line, Stage, Rect } from 'react-konva'
 import { KonvaEventObject } from 'konva/lib/Node';
 import { useState, useRef, useEffect } from 'react';
-import { address,port } from './constants';
+import { address, port } from './constants';
+import CursorCircle from './CursorCircle';
+import { IPos, IPosID } from './types';
 import { socket } from './SocketService';
 import { generateId } from './util';
 import CursorComponent from './CursorComponent';
@@ -28,14 +30,14 @@ function App() {
   }
 
   const handleMouseMove = (e: KonvaEventObject<MouseEvent>) => {
+    const pointer = stageRef.current.getPointerPosition();
+    sendCursor({ x: pointer.x, y: pointer.y, userId: id });
     if (isDrawing && stageRef.current) {
-      const pointer = stageRef.current.getPointerPosition();
       const newPoints = points ? [...points, pointer.x, pointer.y] : [pointer.x, pointer.y];
       socket.emit("draw", newPoints);
       setPoints(newPoints);
     }
   };
-
 
   const [id, setId] = useState<string>(generateId());
 
@@ -48,17 +50,19 @@ function App() {
     }
   }
 
-  const [message,setMessage] = useState<boolean>(false);
+  const [message, setMessage] = useState<boolean>(false);
 
-  const clickButton  = () => {
-    if(socket.connected) {
-      socket.emit("button", { ok:true});
+  const clickButton = () => {
+    console.log('clicked');
+    if (socket.connected) {
+      socket.emit("button", { ok: true });
     }
   };
 
   useEffect(() => {
 
     socket.on('cursor-update', (data: IPosID[]) => {
+      console.log(data);
       setCursors((prevCursors: any) => ({
         ...prevCursors,
         [data[0].userId]: { x: data[0].x, y: data[0].y }  // Aggiorna la posizione del cursore specifico
@@ -70,7 +74,7 @@ function App() {
       setPoints(data);
       //setPositions(posId);
     });
-    socket.on('button-click', (data) => { 
+    socket.on('button-click', (data) => {
       console.log('data');
       showMessage();
     });
@@ -82,42 +86,34 @@ function App() {
 
   });
 
-  const [newPos,setNewPos] = useState<IPos>();
+  const [newPos, setNewPos] = useState<IPos>();
 
-  const handleButtonClick = (e:React.MouseEvent) => { 
+  const handleButtonClick = (e: React.MouseEvent) => {
     clickButton();
     showMessage();
   };
 
-  const showMessage =  () => { 
-      setMessage(true);
-      setTimeout( () => {
-        setMessage(false)
-      },5000);
+  const showMessage = () => {
+    setMessage(true);
+    setTimeout(() => {
+      setMessage(false)
+    }, 5000);
   };
 
 
-  const cursorMove = (e:React.MouseEvent) => { 
+  const cursorMove = (e: React.MouseEvent) => {
 
-    const pos : IPos ={ x:e.clientX,y:e.clientY};
-    setNewPos (pos);
+    const pos: IPos = { x: e.clientX, y: e.clientY };
+    setNewPos(pos);
 
-    sendCursor({...pos, userId:id});
+    sendCursor({ ...pos, userId: id });
 
   };
 
   return (
     <div
-    onMouseMove={cursorMove}
-    className={"fullDiv"}
+      className={"fullDiv"}
     >
-<div>
-      {Object.entries(cursors).map(([id, position]) => (
-        <CursorComponent key={id} x={(position as any).x} y={(position as any).y} id={''} color="blue" />
-      ))}
-      {newPos &&  <CursorComponent key={id} x={newPos.x} y={newPos.y} id={''} color="red"/> } 
-    </div>
-
       <Stage
         ref={stageRef}
         width={1024} height={1024}
@@ -142,7 +138,6 @@ function App() {
 
           {points &&
 
-
             <Line
               points={points}
               stroke={'red'}
@@ -151,17 +146,21 @@ function App() {
               lineCap='round'
             />
           }
-
-
+          {Object.entries(cursors).map(([id, position]) => (
+            <CursorCircle key={id} pos={position} id={''} color="blue" />
+          ))}
+          {newPos &&
+            <CursorCircle key={id} pos={newPos} id={''} color="blue" />
+          }
 
         </Layer>
 
       </Stage>
 
       <button type='button'
-      onClick={handleButtonClick}
+        onClick={handleButtonClick}
       > Click me if you can</button>
-      {message && <p style={{color:'red'}}>You dare to click me</p>}
+      {message && <p style={{ color: 'red' }}>You dare to click me</p>}
     </div>
   )
 }
