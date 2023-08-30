@@ -51,14 +51,18 @@ function App() {
 
     socket.on('cursor-update', (data: IPosID[]) => {
       
-      if (!cursors[data[0].userId]) {  // Verifica che il cursore con quell'ID esista
+      /*if (!cursors[data[0].userId]) {  // Verifica che il cursore con quell'ID esista
         console.log("newCursor")
 
         setCursors((prevCursors: any) => ({
           ...prevCursors,
           [data[0].userId]: { x: data[0].x, y: data[0].y }  // Aggiorna la posizione del cursore specifico
         }));
-      }
+      }*/
+      setCursors((prevCursors: any) => ({
+        ...prevCursors,
+        [data[0].userId]: { x: data[0].x, y: data[0].y }  // Aggiorna la posizione del cursore specifico
+      }));
       //setPositions(posId);
     });
 
