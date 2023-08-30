@@ -33,8 +33,9 @@ function App() {
     const pointer = stageRef.current.getPointerPosition();
     sendCursor({ x: pointer.x, y: pointer.y, userId: id });
     if (isDrawing && stageRef.current) {
-      const newPoints = points ? [...points, pointer.x, pointer.y] : [pointer.x, pointer.y];
-      socket.emit("draw", newPoints);
+      const pointsxy = [pointer.x,pointer.y];
+      const newPoints = points ? [...points, ...pointsxy] : pointsxy;
+      socket.emit("draw", pointsxy);
       setPoints(newPoints);
     }
   };
@@ -53,7 +54,6 @@ function App() {
   const [message, setMessage] = useState<boolean>(false);
 
   const clickButton = () => {
-    console.log('clicked');
     if (socket.connected) {
       socket.emit("button", { ok: true });
     }
@@ -62,7 +62,6 @@ function App() {
   useEffect(() => {
 
     socket.on('cursor-update', (data: IPosID[]) => {
-      console.log(data);
       setCursors((prevCursors: any) => ({
         ...prevCursors,
         [data[0].userId]: { x: data[0].x, y: data[0].y }  // Aggiorna la posizione del cursore specifico
@@ -75,7 +74,6 @@ function App() {
       //setPositions(posId);
     });
     socket.on('button-click', (data) => {
-      console.log('data');
       showMessage();
     });
 
