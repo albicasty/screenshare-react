@@ -31,6 +31,7 @@ function App() {
     if (isDrawing && stageRef.current) {
       const pointer = stageRef.current.getPointerPosition();
       const newPoints = points ? [...points, pointer.x, pointer.y] : [pointer.x, pointer.y];
+      socket.emit("draw", newPoints);
       setPoints(newPoints);
     }
   };
@@ -50,19 +51,15 @@ function App() {
   useEffect(() => {
 
     socket.on('cursor-update', (data: IPosID[]) => {
-      
-      /*if (!cursors[data[0].userId]) {  // Verifica che il cursore con quell'ID esista
-        console.log("newCursor")
-
-        setCursors((prevCursors: any) => ({
-          ...prevCursors,
-          [data[0].userId]: { x: data[0].x, y: data[0].y }  // Aggiorna la posizione del cursore specifico
-        }));
-      }*/
       setCursors((prevCursors: any) => ({
         ...prevCursors,
         [data[0].userId]: { x: data[0].x, y: data[0].y }  // Aggiorna la posizione del cursore specifico
       }));
+      //setPositions(posId);
+    });
+
+    socket.on('draw-update', (data: any[]) => {
+      setPoints(data);
       //setPositions(posId);
     });
 
