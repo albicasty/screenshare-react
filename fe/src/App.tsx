@@ -42,7 +42,7 @@ function App() {
 
   const sendCursor = (pos: IPosID) => {
     if (socket.connected) {
-      socket.emit("cursor", { pos: pos, id: id });
+      socket.emit("cursor", { ...pos, userId: id });
     }
   }
 
@@ -50,6 +50,8 @@ function App() {
 
     socket.on('cursor-update', (data: IPosID[]) => {
       if (cursors[data[0].userId]) {  // Verifica che il cursore con quell'ID esista
+        console.log("newCursor")
+
         setCursors((prevCursors: any) => ({
           ...prevCursors,
           [data[0].userId]: { x: data[0].x, y: data[0].y }  // Aggiorna la posizione del cursore specifico
@@ -69,7 +71,7 @@ function App() {
 
     const pos : IPos ={ x:e.clientX,y:e.clientY};
 
-    sendCursor({pos:pos,id:id});
+    sendCursor({...pos, userId:id});
 
   };
 
