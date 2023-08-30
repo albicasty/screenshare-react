@@ -4,6 +4,7 @@ interface IPos {
 }
 
 interface IPosID { 
-    pos : IPos,
-    id : string;
+    x:number; 
+    y:number;
+    userId : string;
 }

@@ -11,6 +11,7 @@ function App() {
 
   const [points, setPoints] = useState<number[]>();
   const [isDrawing, setisDrawing] = useState<boolean>(false);
+  const [cursors, setCursors] = useState({} as any);
   const stageRef = useRef<Stage>(null);
 
   const handleMouseDown = () => {
@@ -48,8 +49,14 @@ function App() {
   useEffect(() => {
     fetch(`${address}:${port}`).then(rx => console.log(rx));
 
-    socket.on('cursor-update', (posId: IPosID[]) => {
-      setPositions(posId);
+    socket.on('cursor-update', (data: IPosID[]) => {
+      if (cursors[data[0].userId]) {  // Verifica che il cursore con quell'ID esista
+        setCursors((prevCursors: any) => ({
+          ...prevCursors,
+          [data[0].userId]: { x: data[0].x, y: data[0].y }  // Aggiorna la posizione del cursore specifico
+        }));
+      }
+      //setPositions(posId);
     });
 
     return () => {
