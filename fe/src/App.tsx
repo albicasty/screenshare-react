@@ -1,7 +1,10 @@
 import './App.css'
 import { Layer, Line, Stage, Rect } from 'react-konva'
 import { KonvaEventObject } from 'konva/lib/Node';
-import { useState , useRef} from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { address,port } from './constants';
+import { socket } from './SocketService';
+import { generateId } from './util';
 
 
 function App() {
@@ -25,28 +28,52 @@ function App() {
   const handleMouseMove = (e: KonvaEventObject<MouseEvent>) => {
     if (isDrawing && stageRef.current) {
       const pointer = stageRef.current.getPointerPosition();
-      console.log(pointer);
       const newPoints = points ? [...points, pointer.x, pointer.y] : [pointer.x, pointer.y];
       setPoints(newPoints);
-      console.log(newPoints)
+      sendCursor(pointer);
     }
   };
+
+
+  const [id, setId] = useState<string>(generateId());
+
+  const [positions, setPositions] = useState<IPosID[]>([]);
+
+  const sendCursor = (pos: IPosID) => {
+    if (socket.connected) {
+      socket.emit("cursor", { pos: pos, id: id });
+    }
+  }
+
+  useEffect(() => {
+    fetch(`${address}:${port}`).then(rx => console.log(rx));
+
+    socket.on('cursor-update', (posId: IPosID[]) => {
+      setPositions(posId);
+    });
+
+    return () => {
+      socket.off('cursor-update');
+    }
+
+  });
+
+
 
   return (
     <>
       <Stage
-      ref={stageRef}
-        width={1024}
-        height={1024}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseLeave={handleLeave}
-          onMouseUp={handleMouseUp}
+        ref={stageRef}
+        width={1024} height={1024}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleLeave}
+        onMouseUp={handleMouseUp}
       >
 
         <Layer
-        width={1024}
-        height={1024}
+          width={1024}
+          height={1024}
         >
 
           <Rect
