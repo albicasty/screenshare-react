@@ -48,6 +48,14 @@ function App() {
     }
   }
 
+  const [message,setMessage] = useState<boolean>(false);
+
+  const clickButton  = () => {
+    if(socket.connected) {
+      socket.emit("button");
+    }
+  };
+
   useEffect(() => {
 
     socket.on('cursor-update', (data: IPosID[]) => {
@@ -62,14 +70,31 @@ function App() {
       setPoints(data);
       //setPositions(posId);
     });
+    socket.on('button-click', (data) => { 
+      showMessage();
+    });
 
     return () => {
       socket.off('cursor-update');
+      socket.off('buttonClicked');
     }
 
   });
 
   const [newPos,setNewPos] = useState<IPos>();
+
+  const handleButtonClick = (e:React.MouseEvent) => { 
+    clickButton();
+    showMessage();
+  };
+
+  const showMessage =  () => { 
+      setMessage(true);
+      setTimeout( () => {
+        setMessage(false)
+      },5000);
+  };
+
 
   const cursorMove = (e:React.MouseEvent) => { 
 
@@ -131,6 +156,11 @@ function App() {
         </Layer>
 
       </Stage>
+
+      <button type='button'
+      onClick={handleButtonClick}
+      > Click me if you can</button>
+      {message && <p style={{color:'red'}}>You dare to click me</p>}
     </div>
   )
 }
