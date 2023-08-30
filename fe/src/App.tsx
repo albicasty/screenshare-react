@@ -5,6 +5,7 @@ import { useState, useRef, useEffect } from 'react';
 import { address,port } from './constants';
 import { socket } from './SocketService';
 import { generateId } from './util';
+import CursorComponent from './CursorComponent';
 
 
 function App() {
@@ -49,7 +50,8 @@ function App() {
   useEffect(() => {
 
     socket.on('cursor-update', (data: IPosID[]) => {
-      if (cursors[data[0].userId]) {  // Verifica che il cursore con quell'ID esista
+      
+      if (!cursors[data[0].userId]) {  // Verifica che il cursore con quell'ID esista
         console.log("newCursor")
 
         setCursors((prevCursors: any) => ({
@@ -80,7 +82,11 @@ function App() {
     onMouseMove={cursorMove}
     className={"fullDiv"}
     >
-
+<div>
+      {Object.entries(cursors).map(([id, position]) => (
+        <CursorComponent key={id} x={(position as any).x} y={(position as any).y} id={''} />
+      ))}
+    </div>
 
       <Stage
         ref={stageRef}
